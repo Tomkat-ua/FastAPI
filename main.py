@@ -1,38 +1,28 @@
-from typing import Optional
 from fastapi import FastAPI
-from pydantic import BaseModel
+from typing import List, Dict, Any
+import db
 
-# 1. Створюємо екземпляр FastAPI
 app = FastAPI()
 
-# 2. Визначаємо модель даних для товару (Item) за допомогою Pydantic
-# Це забезпечує автоматичну валідацію вхідних JSON-даних
-class Item(BaseModel):
-    name: str
-    price: float
-    is_offer: Optional[bool] = None
 
-# 3. Визначаємо маршрут (Route) за допомогою декоратора
-@app.get("/")
+@app.get("/endpoints")
 def read_root():
     # Повертає JSON-відповідь
-    return {"Hello": "World"}
+    try:
+        sql = 'select  q.num, q.endpoint,q.api_ver,q.description  from querys q'
+        data = db.get_data(sql)
+        return data
+    except Exception as e:
+        print("Помилка отримання endpoint:", e)
 
-# 4. Маршрут з POST-методом, що приймає Pydantic-модель
-@app.post("/items/")
-def create_item(item: Item):
-    # FastAPI автоматично валідує вхідний JSON на відповідність моделі Item
-    return item
 
-# Приклад: Параметр Шляху (Path Parameter)
-@app.get("/items/{item_id}")
-def read_item(item_id: int):
-    # FastAPI автоматично перетворює item_id на ціле число (int)
-    return {"item_id": item_id}
+@app.get("/data", response_model=List[Dict[str, Any]])
+async def get_data(endpoint: str):
+    print(f"Отримане значення параметра endpoint: {endpoint}")
+    sql = db.get_sql(endpoint)
+    print(sql)
+    raw_data = db.get_data(sql)
+    return raw_data
 
-# Приклад: Параметр Запиту (Query Parameter)
-@app.get("/users/")
-def read_users(skip: int = 0, limit: int = 10):
-    # skip та limit мають значення за замовчуванням
-    return {"skip": skip, "limit": limit}
+
 
