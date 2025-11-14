@@ -1,4 +1,4 @@
 fastapi[all]
-#uvicorn
-#pydantic
+uvicorn
+gunicorn
 fdb
