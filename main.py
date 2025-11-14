@@ -5,7 +5,7 @@ import db
 app = FastAPI()
 
 
-@app.get("/endpoints")
+@app.get("/")
 def read_root():
     # Повертає JSON-відповідь
     try:
