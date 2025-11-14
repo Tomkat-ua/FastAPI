@@ -1,5 +1,5 @@
 
-FROM python:3-alpine
+FROM python:3-slim
 
 LABEL authors="Tomkat"
 
@@ -9,7 +9,11 @@ COPY requirements.txt /app/
 COPY *.py /app/
 COPY start.sh /app/
 
-RUN apk add --no-cache libfbclient2
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends libfbclient2 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* \
+
 RUN pip install -r requirements.txt
 
 CMD ["/app/start.sh"]
