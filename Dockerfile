@@ -11,7 +11,7 @@ COPY start.sh /app/
 
 RUN pip install -r requirements.txt
 
-CMD ["start.sh"]
+CMD ["/app/start.sh"]
 #CMD ["gunicorn", "-w", "4", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "main:app"]
 #main:app --reload
 #CMD ["sh"]
