@@ -9,6 +9,7 @@ COPY requirements.txt /app/
 COPY *.py /app/
 COPY start.sh /app/
 
+RUN apk add --no-cache libfbclient2
 RUN pip install -r requirements.txt
 
 CMD ["/app/start.sh"]
