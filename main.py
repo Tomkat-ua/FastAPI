@@ -14,21 +14,39 @@ class Endpoints(BaseModel):
     class Config:
         populate_by_name = True
 
-@app.get("/data", response_model=List[Dict[str, Any]])
-async def get_data(endpoint: str):
-    print(f"Отримане значення параметра endpoint: {endpoint}")
-    sql = db.get_sql(endpoint)
-    print(sql)
-    raw_data = db.get_data(sql)
-    return raw_data
+# @app.get("/data", response_model=List[Dict[str, Any]])
+# async def get_data(endpoint: str):
+@app.get("/data")
+async def get_data(request: Request):
+    try:
+        # 🌟 Доступ до всіх параметрів запиту як словника (Dict)
+        query_params = dict(request.query_params)
+        endpoint = query_params.get('endpoint')
+        del query_params['endpoint']
 
-@app.get("/endpoints", response_model=List[Endpoints])
+        db_args = query_params
+
+        for key, value in db_args.items():
+            print(f"{key} = {value}")
+
+        sql = db.get_sql(endpoint)
+        if db_args:
+            sql = sql + ' where 1=1'
+            for key, value in db_args.items():
+                sql = sql + ' and '+ key + ' ='+ value
+        print(sql)
+        raw_data = db.get_data(sql)
+        return raw_data
+    except Exception as e:
+        return str(e)
+
+
+@app.get("/", response_model=List[Endpoints])
 async def read_items(request: Request):
     base_url = f"{request.url.scheme}://{request.url.netloc}/data?endpoint="
     sql = 'select  q.num, q.endpoint,q.api_ver,q.description  from querys q'
     data = db.get_data(sql)
     validated_data = []
-
     for row in data:
         item = Endpoints(**row)
         item.URL = f"{base_url}{item.ENDPOINT}"
