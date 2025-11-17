@@ -1,6 +1,7 @@
 from fastapi import FastAPI,Request
-from pydantic import BaseModel, computed_field
+from pydantic import BaseModel
 from typing import List, Dict, Any,Optional
+from fastapi import HTTPException
 import db
 
 app = FastAPI()
@@ -14,9 +15,9 @@ class Endpoints(BaseModel):
     class Config:
         populate_by_name = True
 
-# @app.get("/data", response_model=List[Dict[str, Any]])
+@app.get("/data", response_model=List[Dict[str, Any]])
 # async def get_data(endpoint: str):
-@app.get("/data")
+# @app.get("/data")
 async def get_data(request: Request):
     try:
         # 🌟 Доступ до всіх параметрів запиту як словника (Dict)
@@ -38,7 +39,15 @@ async def get_data(request: Request):
         raw_data = db.get_data(sql)
         return raw_data
     except Exception as e:
-        return str(e)
+        display_sql = sql.replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ').replace('\u003E',
+                                                                                                           '>')
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "error": str(e),
+                "executed_sql": display_sql  # Повертаємо чистий рядок
+            }
+        )
 
 
 @app.get("/", response_model=List[Endpoints])
