@@ -2,9 +2,12 @@ from fastapi import FastAPI,Request
 from pydantic import BaseModel
 from typing import List, Dict, Any,Optional
 from fastapi import HTTPException
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 import db
 
 app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
 class Endpoints(BaseModel):
     NUM: int
@@ -39,26 +42,30 @@ async def get_data(request: Request):
         raw_data = db.get_data(sql)
         return raw_data
     except Exception as e:
-        display_sql = sql.replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ').replace('\u003E',
-                                                                                                           '>')
+        display_sql = sql.replace('\r\n', ' ').replace('\n', ' ').replace('\r', ' ').replace('\u003E','>')
         raise HTTPException(
             status_code=500,
             detail={
                 "error": str(e),
-                "executed_sql": display_sql  # Повертаємо чистий рядок
+                "executed_sql": display_sql
             }
         )
 
-
 @app.get("/", response_model=List[Endpoints])
-async def read_items(request: Request):
+async def get_endpoints(request: Request):
     base_url = f"{request.url.scheme}://{request.url.netloc}/data?endpoint="
-    sql = 'select  q.num, q.endpoint,q.api_ver,q.description  from querys q'
+    sql = 'select  q.num, q.endpoint,q.api_ver,q.description  from querys q order by 1'
     data = db.get_data(sql)
     validated_data = []
     for row in data:
         item = Endpoints(**row)
         item.URL = f"{base_url}{item.ENDPOINT}"
         validated_data.append(item)
-    return validated_data
-
+    # return validated_data
+    context = {
+        "request": request,
+        "title": "Список Ендпоінтів",
+        # 🌟 Передаємо дані у контекст під іменем 'endpoints'
+        "endpoints": validated_data
+    }
+    return templates.TemplateResponse("index.html", context)

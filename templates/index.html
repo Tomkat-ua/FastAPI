@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>API Перегляд</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+<div class="container py-4">
+    <h2 class="mb-4">Список доступних API</h2>
+    <table class="table table-bordered table-hover bg-white shadow-sm">
+        <thead class="table-light">
+        <tr>
+            <th>#</th>
+            <th>Версія</th>
+            <th>Ендпоінт</th>
+            <th>Опис</th>
+            <th>URL</th>
+        </tr>
+        </thead>
+        <tbody>
+         {% for row in endpoints %}
+        <tr>
+            <td>{{ row.NUM }}</td>
+            <td>{{ row.API_VER }}</td>
+            <td>{{ row.ENDPOINT }}</td>
+            <td>{{ row.DESCRIPTION or "—" }}</td>
+            <td><a href="{{ row.URL }}" target="_blank">{{ row.URL }}</a></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Модальне вікно -->
+<div class="modal fade" id="apiModal" tabindex="-1" aria-labelledby="apiModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="apiModalLabel">Деталі API</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрити"></button>
+      </div>
+      <div class="modal-body" id="apiModalBody">
+        ...
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -3,3 +3,5 @@ uvicorn
 gunicorn
 pydantic
 fdb
+jinja2
+python-multipart
