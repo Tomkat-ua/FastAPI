@@ -61,11 +61,16 @@ async def get_endpoints(request: Request):
         item = Endpoints(**row)
         item.URL = f"{base_url}{item.ENDPOINT}"
         validated_data.append(item)
-    # return validated_data
-    context = {
-        "request": request,
-        "title": "Список Ендпоінтів",
-        # 🌟 Передаємо дані у контекст під іменем 'endpoints'
-        "endpoints": validated_data
-    }
-    return templates.TemplateResponse("index.html", context)
+    mode = request.query_params['mode']
+    if mode == 'html':
+        context = {
+            "request": request,
+            "title": "Список Ендпоінтів",
+            # 🌟 Передаємо дані у контекст під іменем 'endpoints'
+            "endpoints": validated_data
+        }
+        return templates.TemplateResponse("index.html", context)
+    if mode == 'json':
+        return validated_data
+
+
