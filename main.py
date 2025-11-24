@@ -1,9 +1,9 @@
-from fastapi import FastAPI,Request
+from fastapi import FastAPI,Request,Query
 from pydantic import BaseModel
 from typing import List, Dict, Any,Optional
 from fastapi import HTTPException
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse
+# from fastapi.responses import HTMLResponse
 import db
 
 app = FastAPI()
@@ -52,7 +52,9 @@ async def get_data(request: Request):
         )
 
 @app.get("/", response_model=List[Endpoints])
-async def get_endpoints(request: Request):
+async def get_endpoints(request: Request,
+                mode: str = Query("html")
+                        ):
     base_url = f"{request.url.scheme}://{request.url.netloc}/data?endpoint="
     sql = 'select  q.num, q.endpoint,q.api_ver,q.description  from querys q order by 1'
     data = db.get_data(sql)
@@ -61,7 +63,7 @@ async def get_endpoints(request: Request):
         item = Endpoints(**row)
         item.URL = f"{base_url}{item.ENDPOINT}"
         validated_data.append(item)
-    mode = request.query_params['mode']
+    # mode = request.query_params['mode']
     if mode == 'html':
         context = {
             "request": request,
