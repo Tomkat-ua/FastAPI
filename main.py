@@ -35,7 +35,9 @@ async def get_data(request: Request):
 
         sql = db.get_sql(endpoint)
         if db_args:
-            sql = sql + ' where 1=1'
+            if 'where' not in sql.lower():
+                sql = sql + ' where 1=1 '
+
             for key, value in db_args.items():
                 sql = sql + ' and '+ key + ' ='+ value
         print(sql)
