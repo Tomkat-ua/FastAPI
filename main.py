@@ -40,7 +40,6 @@ async def get_data(request: Request):
 
             for key, value in db_args.items():
                 sql = sql + ' and '+ key + ' ='+ value
-        print(sql)
         raw_data = db.get_data(sql)
         return raw_data
     except Exception as e:
@@ -73,7 +72,12 @@ async def get_endpoints(request: Request,
             # 🌟 Передаємо дані у контекст під іменем 'endpoints'
             "endpoints": validated_data
         }
-        return templates.TemplateResponse("index.html", context)
+        #return templates.TemplateResponse("index.html", context)
+        return templates.TemplateResponse(
+            request=request,
+            name="index.html",
+            context=context
+        )
     if mode == 'json':
         return validated_data
 
